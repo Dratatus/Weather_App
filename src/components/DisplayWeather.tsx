@@ -3,6 +3,10 @@ import { MainWrapper } from './styles.module'
 import { AiOutlineSearch } from "react-icons/ai"
 import { WiHumidity } from "react-icons/wi"
 import { SiWindicss } from "react-icons/si"
+import { BsFillSunFill, BsCloudyFill, BsFillCloudRainFill, BsCloudFog2Fill } from "react-icons/bs"
+import { RiLoaderFill } from "react-icons/ri"
+import { TiWeatherPartlySunny } from "react-icons/ti"
+
 
 const DisplayWeather = () => {
     return (
