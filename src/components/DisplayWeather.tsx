@@ -2,13 +2,35 @@ import React from 'react'
 import { MainWrapper } from './styles.module'
 import { AiOutlineSearch } from "react-icons/ai"
 import { WiHumidity } from "react-icons/wi"
-import { SiWindicss } from "react-icons/si"
+import { SiLatex, SiWindicss } from "react-icons/si"
 import { BsFillSunFill, BsCloudyFill, BsFillCloudRainFill, BsCloudFog2Fill } from "react-icons/bs"
 import { RiLoaderFill } from "react-icons/ri"
 import { TiWeatherPartlySunny } from "react-icons/ti"
+import axios from "axios";
 
 
 const DisplayWeather = () => {
+
+    const api_key = "xxx";
+    const api_Endpoint = "https://api.openweathermap.org";
+
+    const fetchCurrentWeather = async (lat:number, lon:number) => {
+        const url = `${api_Endpoint}weather?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric`
+        const response = await axios.get(url);
+        return response.data;
+    }
+
+    React.useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const {latitude, longitude} = position.coords;
+            Promise.all([fetchCurrentWeather(latitude, longitude)]).then(
+                ([currentWeather]) => {
+                    console.log(currentWeather)
+                }
+            )
+        })
+    })
+
     return (
         <MainWrapper>
             <div className="container">
