@@ -24,13 +24,40 @@ const DisplayWeather: React.FC = () => {
 
     const [isLoading, setLoading] = React.useState(false)
 
-    const[searchCity, setSearchCity] = React.useState("")
+    const [searchCity, setSearchCity] = React.useState("")
 
     const fetchCurrentWeather = async (lat: number, lon: number) => {
         const url = `${api_Endpoint}?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric`;
         const response = await axios.get(url);
         return response.data;
     }
+
+    const fetchWeatherData = async (city: string) => {
+        try {
+            const url = `${api_Endpoint}?q=${city}&appid=${api_key}&units=metric`
+            const searchResponse = await axios.get(url)
+
+            const currentWeatherData: WeatherDataProps = searchResponse.data;
+            return { currentWeatherData };
+        } catch (error) {
+            console.log("No city Found!")
+            throw error;
+        }
+    }
+
+    const handleSearch = async () => {
+        if (searchCity.trim() === "") {
+            return;
+        }
+
+        try {
+            const { currentWeatherData } = await fetchWeatherData(searchCity)
+            setWeatherData(currentWeatherData)
+        } catch (error) {
+            console.log("no results Found")
+        }
+    }
+
 
     const iconChanger = (weather: string) => {
         let iconElement: React.ReactNode;
@@ -86,10 +113,13 @@ const DisplayWeather: React.FC = () => {
         <MainWrapper>
             <div className="container">
                 <div className="searchArea">
-                    <input type='text' placeholder='enter a city' />
+                    <input type='text' placeholder='enter a city'
+                        value={searchCity}
+                        onChange={(e) => setSearchCity(e.target.value)}
+                    />
 
                     <div className="searchCircle">
-                        <AiOutlineSearch className='searchIcon'></AiOutlineSearch>
+                        <AiOutlineSearch className='searchIcon' onClick={handleSearch}></AiOutlineSearch>
                     </div>
                 </div>
 
