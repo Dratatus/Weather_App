@@ -22,6 +22,10 @@ const DisplayWeather: React.FC = () => {
 
     const [weatherData, setWeatherData] = React.useState<WeatherDataProps | null>(null);
 
+    const [isLoading, setLoading] = React.useState(false)
+
+    const[searchCity, setSearchCity] = React.useState("")
+
     const fetchCurrentWeather = async (lat: number, lon: number) => {
         const url = `${api_Endpoint}?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric`;
         const response = await axios.get(url);
@@ -71,6 +75,7 @@ const DisplayWeather: React.FC = () => {
             Promise.all([fetchCurrentWeather(latitude, longitude)]).then(
                 ([currentWeather]) => {
                     setWeatherData(currentWeather)
+                    setLoading(true)
                     console.log(currentWeather)
                 }
             )
@@ -88,7 +93,7 @@ const DisplayWeather: React.FC = () => {
                     </div>
                 </div>
 
-                {weatherData && (
+                {weatherData && isLoading ? (
                     <>
                         <div className="weatherArea">
                             <h1>{weatherData.name}</h1>
@@ -119,7 +124,13 @@ const DisplayWeather: React.FC = () => {
                             </div>
                         </div>
                     </>
-                )}
+                ) : (
+                    <div className="loading">
+                        <RiLoaderFill className="loadingIcon" />
+                        <p>Loading</p>
+                    </div>
+                )
+                }
 
 
             </div>
