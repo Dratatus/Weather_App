@@ -3,98 +3,48 @@ import { MainWrapper } from "./weather.module";
 import { AiOutlineSearch } from "react-icons/ai";
 import { WiHumidity } from "react-icons/wi";
 import { SiWindicss } from "react-icons/si";
-import {
-    BsFillSunFill,
-    BsCloudyFill,
-    BsFillCloudRainFill,
-    BsCloudFog2Fill,
-} from "react-icons/bs";
-import { RiLoaderFill } from "react-icons/ri";
-import { TiWeatherPartlySunny } from "react-icons/ti";
-import axios from "axios";
-import { WeatherDataProps } from "../interfaces/WeatherDataProps";
+import { WeatherDataProps } from "../types/WeatherDataProps";
+import iconChanger from "./common/IconChanger";
+import Loading from "./common/Loading";
+import { fetchCurrentWeather, fetchWeatherByCity } from "../services/weatherApiService";
 
 
 const DisplayWeather: React.FC = () => {
 
-    const api_key = "fc60a7af15d3d4eaf7941db38bd2da55";
-    const api_Endpoint = "https://api.openweathermap.org/data/2.5/weather";
-
     const [weatherData, setWeatherData] = React.useState<WeatherDataProps | null>(null);
-
     const [isLoading, setLoading] = React.useState(false)
-
     const [searchCity, setSearchCity] = React.useState("")
-
-    const fetchCurrentWeather = async (lat: number, lon: number) => {
-        const url = `${api_Endpoint}?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric`;
-        const response = await axios.get(url);
-        return response.data;
-    }
-
-    const fetchWeatherData = async (city: string) => {
-        try {
-            const url = `${api_Endpoint}?q=${city}&appid=${api_key}&units=metric`
-            const searchResponse = await axios.get(url)
-
-            const currentWeatherData: WeatherDataProps = searchResponse.data;
-            return { currentWeatherData };
-        } catch (error) {
-            console.log("No city Found!")
-            throw error;
-        }
-    }
 
     const handleSearch = async () => {
         if (searchCity.trim() === "") {
             return;
         }
-
+        setLoading(true);
         try {
-            const { currentWeatherData } = await fetchWeatherData(searchCity)
-            setWeatherData(currentWeatherData)
+            const data = await fetchWeatherByCity(searchCity);
+            setWeatherData(data);
+            setLoading(false);
         } catch (error) {
-            console.log("no results Found")
+            console.error("No results found:", error);
+            setLoading(false)
         }
-    }
+    };
 
+    useEffect(() => {
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+                const currentWeather = await fetchCurrentWeather(latitude, longitude);
+                setWeatherData(currentWeather);
+            } catch (error) {
+                console.error("Error fetching current weather:", error);
+            } finally {
+                setLoading(false);
+            }
+        });
+    }, []);
 
-    const iconChanger = (weather: string) => {
-        let iconElement: React.ReactNode;
-        let iconColor: string;
-
-        switch (weather) {
-            case "Rain":
-                iconElement = <BsFillCloudRainFill />
-                iconColor = "#272829";
-                break;
-
-            case "Clear":
-                iconElement = <BsFillSunFill />
-                iconColor = "#FFC436";
-                break;
-
-            case "Clouds":
-                iconElement = <BsCloudyFill />
-                iconColor = "#102C57";
-                break;
-
-            case "Mist":
-                iconElement = <BsCloudFog2Fill />
-                iconColor = "#279EFF";
-                break;
-
-            default:
-                iconElement = <TiWeatherPartlySunny />
-                iconColor = "#7B2869"
-        }
-
-        return (
-            <span className="icon" style={{ color: iconColor }}>
-                {iconElement}
-            </span>
-        )
-    }
 
     React.useEffect(() => {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -102,7 +52,7 @@ const DisplayWeather: React.FC = () => {
             Promise.all([fetchCurrentWeather(latitude, longitude)]).then(
                 ([currentWeather]) => {
                     setWeatherData(currentWeather)
-                    setLoading(true)
+                    setLoading(false)
                     console.log(currentWeather)
                 }
             )
@@ -123,7 +73,7 @@ const DisplayWeather: React.FC = () => {
                     </div>
                 </div>
 
-                {weatherData && isLoading ? (
+                {weatherData && !isLoading ? (
                     <>
                         <div className="weatherArea">
                             <h1>{weatherData.name}</h1>
@@ -154,15 +104,8 @@ const DisplayWeather: React.FC = () => {
                             </div>
                         </div>
                     </>
-                ) : (
-                    <div className="loading">
-                        <RiLoaderFill className="loadingIcon" />
-                        <p>Loading</p>
-                    </div>
-                )
+                ) : (< Loading />)
                 }
-
-
             </div>
         </MainWrapper>
     )
