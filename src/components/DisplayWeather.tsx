@@ -3,7 +3,7 @@ import { MainWrapper } from "../styles/weather.module";
 import { AiOutlineSearch } from "react-icons/ai";
 import { WeatherDataProps } from "../types/WeatherDataProps";
 import Loading from "./common/Loading";
-import { fetchCurrentWeather, fetchWeatherByCity } from "../services/weatherApiService";
+import { fetchWeatherByCords, fetchWeatherByCity } from "../services/weatherApiService";
 import InfoArea from "./common/InfoArea";
 import WeatherArea from "./common/WeatherArea";
 
@@ -35,7 +35,7 @@ const DisplayWeather: React.FC = () => {
             try {
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const { latitude, longitude } = position.coords;
-                    const currentWeather = await fetchCurrentWeather(latitude, longitude);
+                    const currentWeather = await fetchWeatherByCords(latitude, longitude);
                     setWeatherData(currentWeather);
                 });
             } catch (error) {
