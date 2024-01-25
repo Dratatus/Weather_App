@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { MainWrapper } from "../styles/weather.module";
 import { AiOutlineSearch } from "react-icons/ai";
 import { WeatherDataProps } from "../types/WeatherDataProps";
