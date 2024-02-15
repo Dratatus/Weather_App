@@ -16,5 +16,5 @@ Application requests access to the user's geolocation upon visit to provide imme
 - CSS
 
 # Authors
-- [Daniel Partatus](https://github.com/BugLurker404)
+- [Daniel Partatus](https://github.com/Dratatus)
 - [Mateusz Stradomski](https://github.com/Stradomsky)
